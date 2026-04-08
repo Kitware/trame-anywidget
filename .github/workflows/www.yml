@@ -36,10 +36,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
       - name: Install the project
-        run: uv sync --all-extras --dev
+        run: |
+          uv sync --all-extras --dev
       - name: Generate www
         run: |
-          nox -s www
+          uvx nox -s www
           touch www/.nojekyll
       - name: Upload artifact
         id: deployment
