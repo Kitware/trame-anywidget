@@ -1,0 +1,24 @@
+{
+  "www": ["trame-client==3.11.4"],
+  "vuetify3": [
+    "trame-vuetify==3.0.3",
+    "trame-vuetify==3.1.0",
+    "trame-vuetify==3.2.0",
+    "trame-vuetify==3.2.1"
+  ],
+  "vuetify3_lab": [
+    "trame-vuetify==3.0.3",
+    "trame-vuetify==3.1.0",
+    "trame-vuetify==3.2.0",
+    "trame-vuetify==3.2.1"
+  ],
+  "vtk": ["trame-vtk==2.11.6", "trame-vtk==2.11.5"],
+  "vtklocal": [
+    "trame-vtklocal",
+    "vtk==9.6.1",
+    "vtk==9.6.0",
+    "vtk==9.5.2",
+    "vtk==9.5.1",
+    "vtk==9.5.0"
+  ]
+}
