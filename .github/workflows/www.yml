@@ -4,7 +4,7 @@ name: Deploy Trame WWW
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,14 +27,14 @@ jobs:
     env:
       UV_PYTHON: "3.12"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
           version: "0.11.3"
           enable-cache: true
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v6
       - name: Install the project
         run: uv sync --all-extras --dev
       - name: Generate www
@@ -43,7 +43,7 @@ jobs:
           touch www/.nojekyll
       - name: Upload artifact
         id: deployment
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: www
   deploy:
@@ -59,4 +59,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
