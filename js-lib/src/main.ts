@@ -1,5 +1,6 @@
 import type { RenderProps } from "@anywidget/types";
 import { ConnectionManager } from "./ConnectionManager";
+import { AnyWidgetProxy } from "./AnyWidgetProxy";
 
 function render({ model, el }: RenderProps) {
   const serverName = model.get("name");
@@ -11,28 +12,27 @@ function render({ model, el }: RenderProps) {
   console.log("clientId", clientId);
 
   // Provide connection handler
-  if (!(window as any).trameJupyter) {
-    (window as any).trameJupyter = new ConnectionManager();
+  if (!(window as any).trameAnyWidget) {
+    (window as any).trameAnyWidget = new ConnectionManager();
   }
-  (window as any).trameJupyter.registerServerConnection(serverName, model);
+
+  const channel = new MessageChannel();
+  (window as any).trameAnyWidget.registerProxy(
+    serverName,
+    new AnyWidgetProxy(model, channel.port1),
+  );
 
   // Add iframe
   const sandbox = document.createElement("iframe");
   sandbox.dataset.server = serverName;
   sandbox.dataset.client = clientId;
   sandbox.style = `border: none; width: 100%; height: ${height};`;
-  el.appendChild(sandbox);
-
-  console.log("iframe", sandbox);
-  console.log("iframe.contentWindow", sandbox.contentWindow);
-
   sandbox.onload = () => {
-    console.log("iframe.contentWindow (loaded)", sandbox.contentWindow);
-    (sandbox.contentWindow as any).WSLINK = (window as any).trameJupyter.init(
-      sandbox.contentWindow,
-      sandbox,
-    );
+    sandbox.contentWindow?.postMessage("trame-ws-channel-init", "*", [
+      channel.port2,
+    ]);
   };
-  sandbox.src = `https://kitware.github.io/trame-anywidget/?ui=${ui}`;
+  sandbox.src = `https://kitware.github.io/trame-anywidget/?wsChannel&ui=${ui}`;
+  el.appendChild(sandbox);
 }
 export default { render };
