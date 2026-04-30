@@ -32,7 +32,8 @@ function render({ model, el }: RenderProps) {
       channel.port2,
     ]);
   };
-  sandbox.src = `https://kitware.github.io/trame-anywidget/?wsChannel&ui=${ui}`;
+  // sandbox.src = `https://kitware.github.io/trame-anywidget/?wsProxy=wsChannel&ui=${ui}`;
+  sandbox.src = `http://localhost:8000/?wsProxy=wsChannel`;
   el.appendChild(sandbox);
 }
 export default { render };
