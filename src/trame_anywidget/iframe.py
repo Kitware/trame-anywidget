@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 import anywidget
@@ -17,7 +18,49 @@ class IdGenerator:
         return f"{self.prefix}{self.count}"
 
 
+class TrameServerRegistry:
+    def __init__(self):
+        self._servers = {}
+        self._widgets = {}
+
+    async def start_server(self, server):
+        if server.running:
+            msg = "Server already running"
+            raise ValueError(msg)
+
+        rs = server.start(
+            open_browser=False,
+            show_connection_info=False,
+            backend="generic",
+        )
+        self._servers[server.name] = server
+        print(f"{rs=}", server)
+
+    async def stop_server(self, server):
+        name = server.name
+        running_server = self._servers.pop(name, None)
+        if running_server:
+            await running_server.stop()
+
+    async def register(self, server, anywidget):
+        name = server.name
+        self._widgets.setdefault(name, []).append(anywidget)
+        if server.name in self._servers:
+            return
+
+        # start generic server
+        await self.start_server(server)
+
+    async def unregister(self, server, anywidget):
+        name = server.name
+        server_widgets = self._widgets.get(name, set())
+        server_widgets.discard(anywidget)
+        if not server_widgets:
+            await self.stop_server(server)
+
+
 CLIENT_ID_GENERATOR = IdGenerator()
+REGISTRY = TrameServerRegistry()
 
 
 class TrameIFrame(anywidget.AnyWidget):
@@ -35,6 +78,8 @@ class TrameIFrame(anywidget.AnyWidget):
             client=CLIENT_ID_GENERATOR.next(),
             **kwargs,
         )
+
+        self._task = asyncio.create_task(REGISTRY.register(self._trame_server, self))
 
         # print(dir(self))
         self.on_msg(self._handle_custom_message)
